@@ -33,6 +33,7 @@ import nodomain.freeyourgadget.gadgetbridge.service.btle.AbstractBTLEDeviceSuppo
 import nodomain.freeyourgadget.gadgetbridge.service.btle.GattService;
 import nodomain.freeyourgadget.gadgetbridge.service.btle.TransactionBuilder;
 import nodomain.freeyourgadget.gadgetbridge.service.btle.actions.SetDeviceStateAction;
+import nodomain.freeyourgadget.gadgetbridge.util.Prefs;
 
 public class ID115Support extends AbstractBTLEDeviceSupport {
     private static final Logger LOG = LoggerFactory.getLogger(ID115Support.class);
@@ -56,6 +57,7 @@ public class ID115Support extends AbstractBTLEDeviceSupport {
 
         getDeviceInfo(builder);
         setUnits(builder);
+        setActivateDisplayOnLift(builder);
         setTime(builder);
         setWrist(builder);
         setScreenOrientation(builder);
@@ -282,6 +284,22 @@ public class ID115Support extends AbstractBTLEDeviceSupport {
                 timeMode,
                 strideRun,
                 strideGPSCal
+        });
+    }
+
+    void setActivateDisplayOnLift(TransactionBuilder builder) {
+        Prefs prefs = GBApplication.getPrefs();
+        boolean activate = prefs.getBoolean(ID115Constants.PREF_ACTIVATE_DISPLAY_ON_LIFT,false);
+        int activeTime = prefs.getInt(ID115Constants.PREF_ACTIVATE_DISPLAY_ON_LIFT_ACTIVE_TIME, 5);
+        if (activeTime > 255) activeTime = 255;
+
+        builder.write(normalWriteCharacteristic, new byte[]{
+                ID115Constants.CMD_ID_SETTINGS, ID115Constants.SET_UP_HAND_GESTURE,
+                (byte)(activate? 0xAA : 0x55),
+                (byte)activeTime,
+                1,      // hasTimeRange
+                0, 0,   // start HH:MM
+                23, 59, // end HH:MM
         });
     }
 

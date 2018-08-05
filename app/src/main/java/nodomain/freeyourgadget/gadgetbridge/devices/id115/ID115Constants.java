@@ -9,6 +9,8 @@ import static nodomain.freeyourgadget.gadgetbridge.service.btle.AbstractBTLEDevi
 public class ID115Constants {
     public static final String PREF_WRIST = "id115_wrist";
     public static final String PREF_SCREEN_ORIENTATION = "id115_screen_orientation";
+    public static final String PREF_ACTIVATE_DISPLAY_ON_LIFT = "id115_activate_display_on_lift";
+    public static final String PREF_ACTIVATE_DISPLAY_ON_LIFT_ACTIVE_TIME = "id115_activate_display_on_lift_active_time";
 
     public static final UUID UUID_SERVICE_ID115 = UUID.fromString(String.format(BASE_UUID, "0AF0"));
     public static final UUID UUID_CHARACTERISTIC_WRITE_NORMAL = UUID.fromString(String.format(BASE_UUID, "0AF6"));
@@ -49,6 +51,7 @@ public class ID115Constants {
     public static final byte CMD_KEY_SET_HAND = 0x22;
     public static final byte CMD_ARG_LEFT = 0x00;
     public static final byte CMD_ARG_RIGHT = 0x01;
+    public static final byte SET_UP_HAND_GESTURE = 0x28;
     public static final byte CMD_KEY_SET_DISPLAY_MODE = 0x2B;
     public static final byte CMD_ARG_HORIZONTAL = 0x00;
     public static final byte CMD_ARG_VERTICAL = 0x02;

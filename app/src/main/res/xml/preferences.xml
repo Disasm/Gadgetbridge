@@ -582,6 +582,20 @@
                     android:title="@string/prefs_screen_orientation"
                     android:summary="%s" />
             </PreferenceCategory>
+            <PreferenceCategory android:title="@string/mi2_prefs_activate_display_on_lift">
+                <CheckBoxPreference
+                    android:defaultValue="true"
+                    android:key="id115_activate_display_on_lift"
+                    android:title="@string/mi2_prefs_activate_display_on_lift" />
+
+                <EditTextPreference
+                    android:dependency="id115_activate_display_on_lift"
+                    android:key="id115_activate_display_on_lift_active_time"
+                    android:inputType="number"
+                    android:maxLength="1"
+                    android:defaultValue="5"
+                    android:title="@string/pref_title_screentime"/>
+            </PreferenceCategory>
         </PreferenceScreen>
     </PreferenceCategory>
 
