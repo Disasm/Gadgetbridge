@@ -26,7 +26,7 @@ public class SendNotificationOperation extends AbstractID115Operation {
 
     SendNotificationOperation(ID115Support support, NotificationSpec notificationSpec)
     {
-        super(support);
+        super(support, false);
 
         String phone = "";
         if (notificationSpec.phoneNumber != null) {
@@ -54,7 +54,7 @@ public class SendNotificationOperation extends AbstractID115Operation {
 
     SendNotificationOperation(ID115Support support, CallSpec callSpec)
     {
-        super(support);
+        super(support, false);
 
         String number = "";
         if (callSpec.number != null) {
@@ -69,11 +69,6 @@ public class SendNotificationOperation extends AbstractID115Operation {
         currentNotificationBuffer = encodeCallNotification(name, number);
         currentNotificationSize = (currentNotificationBuffer.length + 15) / 16;
         currentNotificationType = ID115Constants.CMD_KEY_NOTIFY_CALL;
-    }
-
-    @Override
-    boolean isHealthOperation() {
-        return false;
     }
 
     @Override

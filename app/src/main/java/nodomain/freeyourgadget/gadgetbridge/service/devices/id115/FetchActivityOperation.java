@@ -28,12 +28,7 @@ public class FetchActivityOperation extends AbstractID115Operation {
     private ArrayList<byte[]> packets;
 
     protected FetchActivityOperation(ID115Support support) {
-        super(support);
-    }
-
-    @Override
-    boolean isHealthOperation() {
-        return true;
+        super(support, true);
     }
 
     @Override

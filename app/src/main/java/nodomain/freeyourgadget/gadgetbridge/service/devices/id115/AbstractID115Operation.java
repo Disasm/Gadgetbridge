@@ -16,11 +16,14 @@ import nodomain.freeyourgadget.gadgetbridge.util.GB;
 public abstract class AbstractID115Operation extends AbstractBTLEOperation<ID115Support> {
     protected BluetoothGattCharacteristic controlCharacteristic = null;
     protected BluetoothGattCharacteristic notifyCharacteristic = null;
+    private boolean isHealthOperation;
 
-    protected AbstractID115Operation(ID115Support support) {
+    protected AbstractID115Operation(ID115Support support, boolean isHealthOperation) {
         super(support);
 
-        if (isHealthOperation()) {
+        this.isHealthOperation = isHealthOperation;
+
+        if (isHealthOperation) {
             controlCharacteristic = getCharacteristic(ID115Constants.UUID_CHARACTERISTIC_WRITE_HEALTH);
             notifyCharacteristic = getCharacteristic(ID115Constants.UUID_CHARACTERISTIC_NOTIFY_HEALTH);
         } else {
@@ -67,14 +70,12 @@ public abstract class AbstractID115Operation extends AbstractBTLEOperation<ID115
     }
 
     void enableNotifications(TransactionBuilder builder, boolean enable) {
-        if (isHealthOperation()) {
+        if (isHealthOperation) {
             builder.notify(getCharacteristic(ID115Constants.UUID_CHARACTERISTIC_NOTIFY_HEALTH), enable);
         } else {
             builder.notify(getCharacteristic(ID115Constants.UUID_CHARACTERISTIC_NOTIFY_NORMAL), enable);
         }
     }
-
-    abstract boolean isHealthOperation();
 
     abstract void handleResponse(byte[] data);
 }
