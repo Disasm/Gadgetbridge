@@ -29,6 +29,9 @@ public class ID115Constants {
     public static final byte CMD_ID_FACTORY = (byte)0xaa;
     public static final byte CMD_ID_DEVICE_RESTART = (byte)0xf0;
 
+    // CMD_ID_GET_INFO
+    public static final byte CMD_KEY_GET_DEVICE_INFO = 0x01;
+
     // CMD_ID_SETTINGS
     public static final byte CMD_KEY_SET_TIME = 0x01;
     public static final byte CMD_KEY_SET_GOAL = 0x03;

@@ -1,5 +1,6 @@
 package nodomain.freeyourgadget.gadgetbridge.service.devices.id115;
 
+import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.net.Uri;
 
@@ -17,6 +18,7 @@ import nodomain.freeyourgadget.gadgetbridge.devices.id115.ID115Constants;
 import nodomain.freeyourgadget.gadgetbridge.impl.GBDevice;
 import nodomain.freeyourgadget.gadgetbridge.model.ActivityUser;
 import nodomain.freeyourgadget.gadgetbridge.model.Alarm;
+import nodomain.freeyourgadget.gadgetbridge.model.BatteryState;
 import nodomain.freeyourgadget.gadgetbridge.model.CalendarEventSpec;
 import nodomain.freeyourgadget.gadgetbridge.model.CallSpec;
 import nodomain.freeyourgadget.gadgetbridge.model.CannedMessagesSpec;
@@ -49,6 +51,7 @@ public class ID115Support extends AbstractBTLEDeviceSupport {
 
         builder.add(new SetDeviceStateAction(getDevice(), GBDevice.State.INITIALIZING, getContext()));
 
+        getDeviceInfo(builder);
         setTime(builder);
         setWrist(builder);
         setScreenOrientation(builder);
@@ -241,6 +244,13 @@ public class ID115Support extends AbstractBTLEDeviceSupport {
 
     }
 
+    void getDeviceInfo(TransactionBuilder builder) {
+        builder.notify(getCharacteristic(ID115Constants.UUID_CHARACTERISTIC_NOTIFY_NORMAL), true);
+        builder.write(normalWriteCharacteristic, new byte[] {
+                ID115Constants.CMD_ID_GET_INFO, ID115Constants.CMD_KEY_GET_DEVICE_INFO
+        });
+    }
+
     void reboot(TransactionBuilder builder) {
         builder.write(normalWriteCharacteristic, new byte[] {
                 ID115Constants.CMD_ID_DEVICE_RESTART, ID115Constants.CMD_KEY_REBOOT
@@ -335,5 +345,31 @@ public class ID115Support extends AbstractBTLEDeviceSupport {
         } catch(IOException e) {
             LOG.warn("Unable to stop call notification", e);
         }
+    }
+
+    @Override
+    public boolean onCharacteristicChanged(BluetoothGatt gatt,
+                                           BluetoothGattCharacteristic characteristic) {
+        UUID characteristicUUID = characteristic.getUuid();
+        if (characteristicUUID.equals(ID115Constants.UUID_CHARACTERISTIC_NOTIFY_NORMAL)) {
+            byte[] data = characteristic.getValue();
+            if (data[0] == ID115Constants.CMD_ID_GET_INFO) {
+                if (data[1] == ID115Constants.CMD_KEY_GET_DEVICE_INFO) {
+                    int firmwareVersion = (data[4] & 0xFF);
+                    int batteryLevel = (data[7] & 0xFF);
+                    boolean isCharging = (data[6] == 1);
+
+                    getDevice().setFirmwareVersion("V" + firmwareVersion);
+                    getDevice().setBatteryLevel((short)batteryLevel);
+                    if (isCharging) {
+                        getDevice().setBatteryState(BatteryState.BATTERY_CHARGING);
+                    } else {
+                        getDevice().setBatteryState(BatteryState.BATTERY_NORMAL);
+                    }
+                }
+                return true;
+            }
+        }
+        return super.onCharacteristicChanged(gatt, characteristic);
     }
 }
