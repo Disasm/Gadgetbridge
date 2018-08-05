@@ -49,11 +49,12 @@ public class ID115Support extends AbstractBTLEDeviceSupport {
 
         builder.add(new SetDeviceStateAction(getDevice(), GBDevice.State.INITIALIZING, getContext()));
 
-        setTime(builder)
-                .setWrist(builder)
-                .setScreenOrientation(builder)
-                .setGoal(builder)
-                .setInitialized(builder);
+        setTime(builder);
+        setWrist(builder);
+        setScreenOrientation(builder);
+        setGoal(builder);
+
+        builder.add(new SetDeviceStateAction(getDevice(), GBDevice.State.INITIALIZED, getContext()));
 
         getDevice().setFirmwareVersion("N/A");
         getDevice().setFirmwareVersion2("N/A");
@@ -174,9 +175,7 @@ public class ID115Support extends AbstractBTLEDeviceSupport {
             getQueue().clear();
 
             TransactionBuilder builder = performInitialized("reboot");
-            builder.write(normalWriteCharacteristic, new byte[] {
-                    ID115Constants.CMD_ID_DEVICE_RESTART, ID115Constants.CMD_KEY_REBOOT
-            });
+            reboot(builder);
             performConnected(builder.getTransaction());
         } catch(Exception e) {
         }
@@ -242,11 +241,13 @@ public class ID115Support extends AbstractBTLEDeviceSupport {
 
     }
 
-    private void setInitialized(TransactionBuilder builder) {
-        builder.add(new SetDeviceStateAction(getDevice(), GBDevice.State.INITIALIZED, getContext()));
+    void reboot(TransactionBuilder builder) {
+        builder.write(normalWriteCharacteristic, new byte[] {
+                ID115Constants.CMD_ID_DEVICE_RESTART, ID115Constants.CMD_KEY_REBOOT
+        });
     }
 
-    ID115Support setTime(TransactionBuilder builder) {
+    void setTime(TransactionBuilder builder) {
         Calendar c = Calendar.getInstance(TimeZone.getDefault());
 
         int day = c.get(Calendar.DAY_OF_WEEK);
@@ -270,10 +271,9 @@ public class ID115Support extends AbstractBTLEDeviceSupport {
                 (byte)c.get(Calendar.SECOND),
                 dayOfWeek
         });
-        return this;
     }
 
-    ID115Support setWrist(TransactionBuilder builder) {
+    void setWrist(TransactionBuilder builder) {
         String value = GBApplication.getPrefs().getString(ID115Constants.PREF_WRIST,
                 "left");
 
@@ -288,10 +288,9 @@ public class ID115Support extends AbstractBTLEDeviceSupport {
                 ID115Constants.CMD_ID_SETTINGS, ID115Constants.CMD_KEY_SET_HAND,
                 wrist
         });
-        return this;
     }
 
-    ID115Support setScreenOrientation(TransactionBuilder builder) {
+    void setScreenOrientation(TransactionBuilder builder) {
         String value = GBApplication.getPrefs().getString(ID115Constants.PREF_SCREEN_ORIENTATION,
                 "horizontal");
 
@@ -306,10 +305,9 @@ public class ID115Support extends AbstractBTLEDeviceSupport {
                 ID115Constants.CMD_ID_SETTINGS, ID115Constants.CMD_KEY_SET_DISPLAY_MODE,
                 orientation
         });
-        return this;
     }
 
-    private ID115Support setGoal(TransactionBuilder transaction) {
+    void setGoal(TransactionBuilder transaction) {
         ActivityUser activityUser = new ActivityUser();
         int value = activityUser.getStepsGoal();
 
@@ -323,7 +321,6 @@ public class ID115Support extends AbstractBTLEDeviceSupport {
                 (byte) ((value >> 24) & 0xff),
                 0, 0
         });
-        return this;
     }
 
     void sendStopCallNotification() {
