@@ -35,6 +35,17 @@ public class ID115Constants {
     // CMD_ID_SETTINGS
     public static final byte CMD_KEY_SET_TIME = 0x01;
     public static final byte CMD_KEY_SET_GOAL = 0x03;
+    public static final byte CMD_KEY_SET_UNITS = 0x11;
+    public static final byte CMD_ARG_UNIT_DIST_KM = 1;
+    public static final byte CMD_ARG_UNIT_DIST_MI = 2;
+    public static final byte CMD_ARG_UNIT_TEMP_C = 1;
+    public static final byte CMD_ARG_UNIT_TEMP_F = 2;
+    public static final byte CMD_ARG_UNIT_WEIGHT_KG = 1;
+    public static final byte CMD_ARG_UNIT_WEIGHT_LB = 2;
+    public static final byte CMD_ARG_UNIT_LANG_ZH = 1;
+    public static final byte CMD_ARG_UNIT_LANG_EN = 2;
+    public static final byte CMD_ARG_UNIT_TIME_24H = 1;
+    public static final byte CMD_ARG_UNIT_TIME_12H = 2;
     public static final byte CMD_KEY_SET_HAND = 0x22;
     public static final byte CMD_ARG_LEFT = 0x00;
     public static final byte CMD_ARG_RIGHT = 0x01;

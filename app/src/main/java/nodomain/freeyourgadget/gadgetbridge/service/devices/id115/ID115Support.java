@@ -3,6 +3,7 @@ package nodomain.freeyourgadget.gadgetbridge.service.devices.id115;
 import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.net.Uri;
+import android.text.format.DateFormat;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,8 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import nodomain.freeyourgadget.gadgetbridge.GBApplication;
+import nodomain.freeyourgadget.gadgetbridge.R;
+import nodomain.freeyourgadget.gadgetbridge.activities.SettingsActivity;
 import nodomain.freeyourgadget.gadgetbridge.devices.id115.ID115Constants;
 import nodomain.freeyourgadget.gadgetbridge.impl.GBDevice;
 import nodomain.freeyourgadget.gadgetbridge.model.ActivityUser;
@@ -52,6 +55,7 @@ public class ID115Support extends AbstractBTLEDeviceSupport {
         builder.add(new SetDeviceStateAction(getDevice(), GBDevice.State.INITIALIZING, getContext()));
 
         getDeviceInfo(builder);
+        setUnits(builder);
         setTime(builder);
         setWrist(builder);
         setScreenOrientation(builder);
@@ -248,6 +252,36 @@ public class ID115Support extends AbstractBTLEDeviceSupport {
         builder.notify(getCharacteristic(ID115Constants.UUID_CHARACTERISTIC_NOTIFY_NORMAL), true);
         builder.write(normalWriteCharacteristic, new byte[] {
                 ID115Constants.CMD_ID_GET_INFO, ID115Constants.CMD_KEY_GET_DEVICE_INFO
+        });
+    }
+
+    void setUnits(TransactionBuilder builder) {
+        String units = GBApplication.getPrefs().getString(SettingsActivity.PREF_MEASUREMENT_SYSTEM, getContext().getString(R.string.p_unit_metric));
+        boolean metric = false;
+        if (units.equals(getContext().getString(R.string.p_unit_metric))) {
+            metric = true;
+        }
+
+        boolean is24hTime = DateFormat.is24HourFormat(getContext());
+
+        byte distanceUnits = metric? ID115Constants.CMD_ARG_UNIT_DIST_KM : ID115Constants.CMD_ARG_UNIT_DIST_MI;
+        byte weightUnits = metric? ID115Constants.CMD_ARG_UNIT_WEIGHT_KG : ID115Constants.CMD_ARG_UNIT_WEIGHT_LB;
+        byte temperatureUnits = ID115Constants.CMD_ARG_UNIT_TEMP_C;
+        byte stride = 0x4b;
+        byte language = ID115Constants.CMD_ARG_UNIT_LANG_EN;
+        byte timeMode = is24hTime? ID115Constants.CMD_ARG_UNIT_TIME_24H : ID115Constants.CMD_ARG_UNIT_TIME_12H;
+        byte strideRun = 0;
+        byte strideGPSCal = 0;
+        builder.write(normalWriteCharacteristic, new byte[] {
+                ID115Constants.CMD_ID_SETTINGS, ID115Constants.CMD_KEY_SET_UNITS,
+                distanceUnits,
+                weightUnits,
+                temperatureUnits,
+                stride,
+                language,
+                timeMode,
+                strideRun,
+                strideGPSCal
         });
     }
 
